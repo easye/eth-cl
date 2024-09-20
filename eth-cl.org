@@ -1,0 +1,35 @@
+Transcribed from a blog post
+<https://www.reddit.com/r/ethereum/comments/169nztd/an_ethereum_library_in_common_lisp/>
+
+No rights reserved.
+
+
+#+begin_src lisp :results raw
+  (ql:quickload "eth-cl")
+  (asdf:make :eth-cl)
+#+end_src
+
+#+RESULTS:
+T
+
+#+begin_src lisp 
+  (eth:make-account)
+#+end_src
+
+#+RESULTS:
+: ((ETH::PRIVATE-KEY . #<IRONCLAD:SECP256K1-PRIVATE-KEY {16493FCF}>)
+:  (ETH::PUBLIC-KEY . #<IRONCLAD:SECP256K1-PUBLIC-KEY {662BE62E}>)
+:  (ETH::ADDRESS . "50b20C8eA5605BbcD807DE605566313Bc8cF7Bf7"))
+
+#+begin_src lisp
+  (eth::compute-address (alexandria:assoc-value (eth:make-account) 'eth::private-key))
+#+end_src
+
+#+RESULTS:
+: 65C6c8625B2220DE52F5b2876b60dc98DD2815CE
+
+* Colophon  
+  #+begin_example
+    Created: 2024-09-20
+    Revised: <2024-09-20 Fri 12:30>
+  #+end_example
