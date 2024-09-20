@@ -37,22 +37,23 @@ Capitalization is implemented using the method described in
                                      :y (getf (ironclad:destructure-private-key private-key) :y)))
          (address
            (compute-address private-key)))
-    `((private-key . ,private-key)
-      (public-key . ,public-key)
-      (address . ,address))))
+    `((:private-key . ,private-key)
+      (:public-key . ,public-key)
+      (:address . ,address))))
 
 (defun address (account)
-  "Returns the address of that account with leading 0x."
-  (concatenate 'string "0x" (cdr (assoc 'address account))))
+  "Returns the address of that account as a hexidecimal string prefixed with 0x"
+  (concatenate 'string "0x"
+               (cdr (assoc :address account))))
 
 (defun private-key (account)
-  "Returns the private key of the account with leading 0x."
+  "Returns the private key of the account as a hexidecimal string prefixed with 0x"
   (concatenate 'string "0x"
                (ironclad:byte-array-to-hex-string
                 (getf (ironclad:destructure-private-key
-                       (cdr (assoc 'private-key account))) :x))))
+                       (cdr (assoc :private-key account))) :x))))
   
 (defun public-key (account)
   "Returns the public key of the account."
-  (cdr (assoc 'public-key account)))
+  (cdr (assoc :public-key account)))
 
