@@ -6,6 +6,7 @@
    #:compute-address
 
    ;;; account helpers
-   #:private-key #:public-key #:address
+   #:private-key #:public-key #:address))
+
 
 
