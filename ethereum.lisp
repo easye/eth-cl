@@ -35,7 +35,8 @@ Capitalization is implemented using the method described in
          (public-key
            (ironclad:make-public-key :secp256k1
                                      :y (getf (ironclad:destructure-private-key private-key) :y)))
-         (address (compute-address private-key)))
+         (address
+           (compute-address private-key)))
     `((private-key . ,private-key)
       (public-key . ,public-key)
       (address . ,address))))
@@ -46,10 +47,11 @@ Capitalization is implemented using the method described in
 
 (defun private-key (account)
   "Returns the private key of the account with leading 0x."
-  (ironclad:byte-array-to-hex-string
-   (getf (ironclad:destructure-private-key
-          (cdr (assoc 'private-key account))) :x)))
-
+  (concatenate 'string "0x"
+               (ironclad:byte-array-to-hex-string
+                (getf (ironclad:destructure-private-key
+                       (cdr (assoc 'private-key account))) :x))))
+  
 (defun public-key (account)
   "Returns the public key of the account."
   (cdr (assoc 'public-key account)))

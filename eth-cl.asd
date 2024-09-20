@@ -1,5 +1,8 @@
 (defsystem eth-cl
-  :depends-on (ironclad)
+  :depends-on (ironclad
+               alexandria)
   :components ((:file "package")
-               (:file "ethereum")))
+               (:file "ethereum")
+               (:file "codex")))
+
 
