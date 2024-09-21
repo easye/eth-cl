@@ -11,11 +11,15 @@ Cribbed from <https://www.reddit.com/r/ethereum/comments/169nztd/an_ethereum_lib
   :depends-on (eth-cl/package
                ironclad
                alexandria)
-  :components ((:file "rlp")
-               (:file "ethereum")
-               (:file "codex")
-               #+nil ;; needs debugging, hooking to JSON serialization
-               (:file "archive")))
+
+  :components ((:module main :pathname "./"
+                :components ((:file "rlp")
+                             (:file "account")
+                             #+nil ;; needs debugging, hooking to JSON serialization
+                             (:file "archive")))
+               (:module codex :pathname "./"
+                        :depends-on (main)
+                :components ((:file "codex")))))
 
 (defsystem eth-cl/t
   :defsystem-depends-on (prove-asdf)  
