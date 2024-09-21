@@ -11,10 +11,11 @@ Cribbed from <https://www.reddit.com/r/ethereum/comments/169nztd/an_ethereum_lib
   :depends-on (eth-cl/package
                ironclad
                alexandria)
-
+  :in-order-to ((test-op (test-op eth-cl/t)))
   :components ((:module main :pathname "./"
                 :components ((:file "rlp")
                              (:file "account")
+                             (:file "transaction")
                              #+nil ;; needs debugging, hooking to JSON serialization
                              (:file "archive")))
                (:module codex :pathname "./"
