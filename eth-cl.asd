@@ -4,7 +4,7 @@
   :components ((:file "package")))
 
 (defsystem eth-cl
-  :version "0.3.0"
+  :version "0.2.3"
   :long-description "Potentially useful code for generating Ethereum artifacts ~
 Cribbed from <https://www.reddit.com/r/ethereum/comments/169nztd/an_ethereum_library_in_common_lisp/>"
   :author (#p"https://www.reddit.com/user/tinkagames_g" #p"urn:easye.not.org")
@@ -18,7 +18,8 @@ Cribbed from <https://www.reddit.com/r/ethereum/comments/169nztd/an_ethereum_lib
                              (:file "account")
                              (:file "transaction")
                              (:file "broker")
-                             #+nil ;; needs debugging, hooking to JSON serialization
+                             (:file "contract")
+                             #+nil ;; slowly shrinking original code 
                              (:file "archive")))
                (:module codex :pathname "./"
                         :depends-on (main)
