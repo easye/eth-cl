@@ -11,7 +11,8 @@ Cribbed from <https://www.reddit.com/r/ethereum/comments/169nztd/an_ethereum_lib
   :depends-on (eth-cl/package
                ironclad
                alexandria)
-  :components ((:file "ethereum")
+  :components ((:file "rlp")
+               (:file "ethereum")
                (:file "codex")
                #+nil ;; needs debugging, hooking to JSON serialization
                (:file "archive")))
@@ -24,7 +25,8 @@ Cribbed from <https://www.reddit.com/r/ethereum/comments/169nztd/an_ethereum_lib
               (uiop:symbol-call :prove-asdf 'run-test-system c))
   :components ((:module test
                 :pathname "./t/"
-                :components ((:test-file "codex")))))
+                :components ((:test-file "rlp")
+                             (:test-file "codex")))))
 
 (defsystem eth-cl/rpc
   :depends-on (eth-cl/package

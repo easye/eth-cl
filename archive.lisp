@@ -71,25 +71,6 @@
           (from-string "input")
           nil)))
 
-(defun rlp-encode (x)
-  "RLP encodes the list passed following the format described here: https://ethereum.org/en/developers/docs/data-structures-and-encoding/rlp/.
-                    x is a list of byte arrays."
-  (cond ((null x) (list #xc0))
-        ((listp x) (let* ((encoded-x (mapcar #'rlp-encode x))
-                          (lengths (mapcar #'length encoded-x))
-                          (total-length (reduce #'+ lengths))
-                          (total-length-bytes (map 'list #'identity (ironclad:integer-to-octets total-length)))
-                          (bytes (reduce #'append encoded-x)))
-                     (if (<= 0 total-length 55)
-                         (cons (+ #xc0 total-length) bytes)
-                         (cons (+ #xf7 (length total-length-bytes)) (append total-length-bytes bytes)))))
-        (t (let*  ((bytes (map 'list #'identity x))
-                   (bytes-length (length x))
-                   (bytes-length-bytes (map 'list #'identity (ironclad:integer-to-octets bytes-length))))
-             (cond ((and (= bytes-length 1) (<= (nth 0 bytes) #x7f)) bytes)
-                   ((<= 0 bytes-length 55) (cons (+ #x80 bytes-length) bytes))
-                   (t (cons (+ #xb7 (length bytes-length-bytes)) (append bytes-length-bytes bytes))))))))
-
 (defun transaction->hash (tx)
   "Computes the hash of a transaction."
   (ironclad:byte-array-to-hex-string
@@ -158,26 +139,6 @@
           (sleep 0.1)))
   tx)
 
-(defun rlp-decode (x)
-  "RLP decodes the list passed following the format described here: https://eth.wiki/en/fundamentals/rlp.
-            x is a byte array."
-  (cond ((zerop (length x)) nil)
-        ((<= 0 (elt x 0) #x7f) (cons (ironclad:byte-array-to-hex-string (subseq x 0 1)) (rlp-decode (subseq x 1))))
-        ((<= #x80 (elt x 0) #xb7)
-         (let ((length (- (elt x 0) #x80)))
-           (cons (ironclad:byte-array-to-hex-string (subseq x 1 (+ 1 length))) (rlp-decode (subseq x (+ 1 length))))))
-        ((<= #xb8 (elt x 0) #xbf)
-         (let* ((length-length (- (elt x 0) #xb7))
-                (length (ironclad:octets-to-integer (subseq x 1 (+ 1 length-length)))))
-           (cons (ironclad:byte-array-to-hex-string (subseq x (+ 1 length-length) (+ 1 length-length length))) (rlp-decode (subseq x (+ 1 length-length length))))))
-        ((= #xc0 (elt x 0)) (append (list nil) (rlp-decode (subseq x 1))))
-        ((< #xc0 (elt x 0) #xf7)
-         (let ((length (- (elt x 0) #xc0)))
-           (append (rlp-decode (subseq x 1 (+ 1 length))) (rlp-decode (subseq x (+ 1 length))))))
-        ((<= #xf8 (elt x 0) #xff)
-         (let* ((length-length (- (elt x 0) #xf7))
-                (length (ironclad:octets-to-integer (subseq x 1 (+ 1 length-length)))))
-           (append (rlp-decode (subseq x (+ 1 length-length) (+ 1 length-length length))) (rlp-decode (subseq x (+ 1 length-length length))))))))
 
 #+nil
 (defun decode-transaction (raw)

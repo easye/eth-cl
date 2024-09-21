@@ -20,7 +20,10 @@ returns 10 instead of \"0xa\"."
                               ((upper-case-p (car l)) (append (list #\- (char-downcase (car l))) (rec (rest l))))
                               (t (cons (car l) (rec (rest l)))))))
                (map 'string #'identity (rec (map 'list #'identity s))))))
-    (let ((name (camel-case-to-kebab-case method)))
+    (let ((name
+            (camel-case-to-kebab-case method))
+          (export-function-p ;; not working
+            nil))
       `(values
         (defun ,(read-from-string name) (&rest params)
          (let ((response (jsown:parse (apply #'rpc (append (list *host* ,method) params)))))
@@ -28,7 +31,8 @@ returns 10 instead of \"0xa\"."
              (if p
                  (error 'rpc-error :method ,name :code (gethash "code" v) :text (gethash "message" v) :data (gethash "data" v))
                  (funcall ,fn (gethash "result" response))))))
-        ,(export (intern (string-upcase name)) :eth/rpc)))))
+        ,(when export-function-p
+           `(export (intern ,(string-upcase name) :eth/rpc)))))))
 
 (defrpc "eth_getBalance" #'hex-string-to-integer)
 (defrpc "eth_getTransactionCount" #'hex-string-to-integer)
