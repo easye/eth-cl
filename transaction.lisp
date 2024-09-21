@@ -87,7 +87,7 @@
   (let* ((flat (transaction->flat tx))
          (hash (transaction->hash tx))
          (jsown (jsown:parse (ecdsa-raw-sign hash pk)))
-         (signature (alexandria:alist-hash-table (rest jsown)))
+         (signature (jsown-as-hashtable jsown))
          (v (gethash "v" signature))
          (r (gethash "r" signature))
          (s (gethash "s" signature))
@@ -100,7 +100,37 @@
                   (coerce (rlp-encode concatenated) '(simple-array (unsigned-byte 8) (*)))))))
 
 (defun ecdsa-raw-sign (hash pk)
+  (declare (ignore hash pk))
   (error "Unimplemented ECDSA signature"))
 
 
-
+(defun decode-transaction (raw)
+  "Decodes a raw (hex string) transaction."
+  (let ((x (rlp-decode (ironclad:hex-string-to-byte-array (subseq raw 4)))))
+    (values
+     (make-instance 'transaction
+                    :type (hex-string-to-integer
+                           (subseq raw 0 4))
+                    :chain-id (ironclad:octets-to-integer
+                               (ironclad:hex-string-to-byte-array (nth 0 x)))
+                    :nonce (ironclad:octets-to-integer
+                            (ironclad:hex-string-to-byte-array (nth 1 x)))
+                    :max-priority-fee-per-gas (ironclad:octets-to-integer
+                                               (ironclad:hex-string-to-byte-array (nth 2 x)))
+                    :max-fee-per-gas (ironclad:octets-to-integer
+                                      (ironclad:hex-string-to-byte-array (nth 3 x)))
+                    :gas (ironclad:octets-to-integer
+                          (ironclad:hex-string-to-byte-array (nth 4 x)))
+                    :to (if (zerop (length (nth 5 x)))
+                            ""
+                            (format nil "0x~a" (nth 5 x)))
+                    :value (ironclad:octets-to-integer
+                            (ironclad:hex-string-to-byte-array (nth 6 x)))
+                    :data (if (zerop (length (nth 7 x)))
+                              ""
+                              (format nil "0x~a" (nth 7 x)))
+                    :from (gethash "result"
+                                   (jsown-as-hashtable (jsown:parse (recover-address raw)))))
+     (ironclad:octets-to-integer (ironclad:hex-string-to-byte-array (nth 9 x)))
+     (format nil "0x~a" (nth 10 x))
+     (format nil "0x~a" (nth 11 x)))))

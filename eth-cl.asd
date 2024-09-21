@@ -13,9 +13,11 @@ Cribbed from <https://www.reddit.com/r/ethereum/comments/169nztd/an_ethereum_lib
                alexandria)
   :in-order-to ((test-op (test-op eth-cl/t)))
   :components ((:module main :pathname "./"
-                :components ((:file "rlp")
+                :components ((:file "json")
+                             (:file "rlp")
                              (:file "account")
                              (:file "transaction")
+                             (:file "broker")
                              #+nil ;; needs debugging, hooking to JSON serialization
                              (:file "archive")))
                (:module codex :pathname "./"
