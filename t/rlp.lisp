@@ -7,16 +7,21 @@
    '(131 #\f #\o #\o))
   "Able to RLP encode a simple string")
 
-#|  FIXME
-(prove:plan 1)
-(let ((string "a simple string"))
-  (prove:ok
-   (equalp
-    string
-    (eth::rlp-decode (eth::rlp-encode string)))
-"Able to roundtrip RLP encoding on a short string"))
-
-|#
+(prove:plan 2)
+(let* ((string
+         "a simple string")
+       (encoded
+         (eth::rlp-encode string)))
+  (prove:is
+   (length string) (1- (length encoded))
+   "RLP encoding length")
+  (let* ((encoded-bytes
+           (eth::as-bytes encoded))
+         (decoded
+           (eth::rlp-decode encoded-bytes)))
+    (prove:is
+     decoded string
+     "Able to roundtrip RLP encoding on a short string")))
 
 (prove:finalize)
 
