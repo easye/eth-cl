@@ -33,5 +33,5 @@ With an ANSI Common Lisp implementation configured with Quicklisp
 * Colophon  
   #+begin_example
     Created: 2024-09-20
-    Revised: <2024-09-20 Fri 22:02>
+    Revised: <2024-09-21 Sat 13:56>
   #+end_example

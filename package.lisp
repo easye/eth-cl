@@ -8,5 +8,8 @@
    ;;; account helpers
    #:private-key #:public-key #:address))
 
+(defpackage :eth/rpc
+  (:use :cl))
+
 
 

@@ -1,14 +1,17 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP -*-
 
+(defsystem eth-cl/package
+  :components ((:file "package")))
+
 (defsystem eth-cl
-  :version "0.2.0"
+  :version "0.3.0"
   :long-description "Potentially useful code for generating Ethereum artifacts ~
 Cribbed from <https://www.reddit.com/r/ethereum/comments/169nztd/an_ethereum_library_in_common_lisp/>"
   :author (#p"https://www.reddit.com/user/tinkagames_g" #p"urn:easye.not.org")
-  :depends-on (ironclad
+  :depends-on (eth-cl/package
+               ironclad
                alexandria)
-  :components ((:file "package")
-               (:file "ethereum")
+  :components ((:file "ethereum")
                (:file "codex")
                #+nil ;; needs debugging, hooking to JSON serialization
                (:file "archive")))
@@ -23,5 +26,7 @@ Cribbed from <https://www.reddit.com/r/ethereum/comments/169nztd/an_ethereum_lib
                 :pathname "./t/"
                 :components ((:test-file "codex")))))
 
-
-
+(defsystem eth-cl/rpc
+  :depends-on (eth-cl/package
+               jsown)
+  :components ((:file "rpc")))
