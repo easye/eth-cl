@@ -1,22 +1,25 @@
 (in-package :eth)
 
-;;;; "Run Length Prefix encoding" :see <https://ethereum.org/en/developers/docs/data-structures-and-encoding/rlp/>
+;;;; "Recursive Length Prefix encoding"
+;;;;   :see <https://ethereum.org/en/developers/docs/data-structures-and-encoding/rlp/>
 
 (defun rlp-encode (x)
-  "Encodes the contents of X as Run Length Prefix
+  "Encodes the contents of X under Recursive Length Prefix
 
-X is a list of byte arrays."
+X is a list of byte arrays.
+
+See <https://ethereum.org/en/developers/docs/data-structures-and-encoding/rlp/>."
   (cond ((null x)
          (list #xc0))
         ((listp x)
          (let* ((encoded-x (mapcar #'rlp-encode x))
-                          (lengths (mapcar #'length encoded-x))
-                          (total-length (reduce #'+ lengths))
-                          (total-length-bytes (map 'list #'identity (ironclad:integer-to-octets total-length)))
-                          (bytes (reduce #'append encoded-x)))
-                     (if (<= 0 total-length 55)
-                         (cons (+ #xc0 total-length) bytes)
-                         (cons (+ #xf7 (length total-length-bytes)) (append total-length-bytes bytes)))))
+                (lengths (mapcar #'length encoded-x))
+                (total-length (reduce #'+ lengths))
+                (total-length-bytes (map 'list #'identity (ironclad:integer-to-octets total-length)))
+                (bytes (reduce #'append encoded-x)))
+           (if (<= 0 total-length 55)
+               (cons (+ #xc0 total-length) bytes)
+               (cons (+ #xf7 (length total-length-bytes)) (append total-length-bytes bytes)))))
         (t (let*  ((bytes (map 'list #'identity x))
                    (bytes-length (length x))
                    (bytes-length-bytes (map 'list #'identity (ironclad:integer-to-octets bytes-length))))
@@ -25,9 +28,9 @@ X is a list of byte arrays."
                    (t (cons (+ #xb7 (length bytes-length-bytes)) (append bytes-length-bytes bytes))))))))
 
 (defun rlp-decode (x)
-  "Decodes the byte array X as Run Length Prefix
+  "Decodes the byte array X as Recursive Length Prefix
 
-For the format of X see <https://ethereum.org/en/developers/docs/data-structures-and-encoding/rlp/>."
+See <https://ethereum.org/en/developers/docs/data-structures-and-encoding/rlp/>."
   (cond ((zerop (length x))
          nil)
         ((<= 0 (elt x 0) #x7f)

@@ -5,13 +5,23 @@ No rights reserved.
 
 * Installation
 With an ANSI Common Lisp implementation configured with Quicklisp
-#+caption: Needed once
+#+caption: Initial Installation
 #+begin_src lisp :results raw
   (ql:quickload "eth-cl")
-  (asdf:make :eth-cl)
+  (asdf:load-system :eth-cl)
 #+end_src
 
 * Usage
+
+#+caption: Load ETH-CL
+#+begin_src lisp
+  (asdf:load-system :eth-cl)
+#+end_src
+
+#+caption: Test ETH-CL
+#+begin_src lisp
+  (asdf:test-system :eth-cl)
+#+end_src
 
 #+caption: Create a new Ethereum account
 #+begin_src lisp 
