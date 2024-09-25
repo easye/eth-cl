@@ -1,16 +1,16 @@
 (in-package :eth)
 
-(defun compute-address (pk)
-  "Computes an Ethereum address from a private key
+(defun compute-address (private-key)
+  "Returns the Ethereum public address of a private key
 
 <https://github.com/ethereumbook/ethereumbook/blob/develop/04keys-addresses.asciidoc>.
 
-Capitalization is implemented using the method described in
-<https://github.com/Ethereum/EIPs/blob/master/EIPS/eip-55.md>"
+The capitalization of the public address is implemented using the
+method described in <https://github.com/Ethereum/EIPs/blob/master/EIPS/eip-55.md>"
   (let* ((hex
            (ironclad:byte-array-to-hex-string
                     (ironclad:digest-sequence :keccak/256
-                                              (subseq (getf (ironclad:destructure-private-key pk) :y) 1))))
+                                              (subseq (getf (ironclad:destructure-private-key private-key) :y) 1))))
          (address
            (subseq hex 24)))
     (loop :for i :from 0 :to (1- (length address))
@@ -24,7 +24,9 @@ Capitalization is implemented using the method described in
 
 
 (defun make-account (&optional secret)
-  "Make an Ethereum account from a secret string / private key"
+  "Make an Ethereum account chosen randomly
+
+Optionally SECRET a hex string encoding of the private key."
   (let* ((bytes
            (if secret
                (ironclad:hex-string-to-byte-array secret)

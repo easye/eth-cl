@@ -40,7 +40,6 @@
     (with-slots (max-fee-per-gas max-priority-fee-per-gas) tx
       (setf max-fee-per-gas (+ max-priority-fee-per-gas (* 2 (eth/gas-price)))))))
 
-
 (defun transaction-payload (tx)
   "Return the payload for tx."
   (with-slots (type chain-id nonce max-priority-fee-per-gas max-fee-per-gas gas to from value data) tx
@@ -59,11 +58,14 @@
 
 (defun transaction->flat (tx)
   "Flattens a transaction in the format described here: https://eips.ethereum.org/EIPS/eip-1559."
-  (labels ((field (x) (cdr (assoc x tx :test #'equal)))
-           (from-integer (x) (ironclad:integer-to-octets (hex-string-to-integer (field x))))
-           (from-string (x) (let* ((s (or (field x) ""))
-                                   (s (if (zerop (length s)) s (subseq s 2))))
-                              (ironclad:hex-string-to-byte-array s))))
+  (labels ((field (x)
+             (cdr (assoc x tx :test #'equal)))
+           (from-integer (x)
+             (ironclad:integer-to-octets (parse-integer (field x) :radix 16)))
+           (from-string (x)
+             (let* ((s (or (field x) ""))
+                    (s (if (zerop (length s)) s (subseq s 2))))
+               (ironclad:hex-string-to-byte-array s))))
     (list (from-integer "chainId")
           (from-integer "nonce")
           (from-integer "maxPriorityFeePerGas")
@@ -78,12 +80,20 @@
   "Computes the hash of a transaction."
   (ironclad:byte-array-to-hex-string
    (ironclad:digest-sequence
-    :keccak/256
-    (coerce (cons 2 (rlp-encode (transaction->flat tx))) '(simple-array (unsigned-byte 8) (*))))))
+    :keccak/256 (coerce
+                 (cons 2
+                       (rlp-encode (transaction->flat tx))) '(simple-array (unsigned-byte 8) (*))))))
 
 (defun encode-transaction (tx pk)
-  "Produces a raw transaction to be sent to the blockchain. It follows the format described here: https://eips.ethereum.org/EIPS/eip-1559.
-                  Signing is done through a Python library as ironclad doesn't return `v`. We initially signed through geth, but signing for a different chain id seems unsupported. Sending the whole transaction structure to web3.py is not satisfactory either as the library tampers with the contents (for instance, adds a gas field to a EIP-1559 transaction.)"
+  "Produces a raw transaction to be sent to the blockchain
+
+The transaction is encoded in the format describe in <https://eips.ethereum.org/EIPS/eip-1559>
+
+Signing is done through a Python library as ironclad doesn't return
+`v`. We initially signed through geth, but signing for a different
+chain id seems unsupported. Sending the whole transaction structure to
+web3.py is not satisfactory either as the library tampers with the
+contents (for instance, adds a gas field to a EIP-1559 transaction.)"
   (let* ((flat (transaction->flat tx))
          (hash (transaction->hash tx))
          (jsown (jsown:parse (ecdsa-raw-sign hash pk)))

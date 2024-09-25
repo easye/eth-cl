@@ -1,3 +1,4 @@
+;;;; Definitely not working
 (in-package :eth)
 
 (defgeneric send (transaction)
@@ -21,9 +22,9 @@
 
 (defclass concurrent-transaction () ())
 
+#+nil
 (defmethod send ((tx concurrent-transaction))
   "Lock the nonce."
-  #+nil
   (log:info "Locking!")
   (with-redis-lock
       (with-slots (from nonce) tx

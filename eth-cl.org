@@ -28,6 +28,11 @@ With an ANSI Common Lisp implementation configured with Quicklisp
   (eth:make-account)
 #+end_src
 
+#+caption: Create a new Ethereum account with keys under <file:~/etc/>
+#+begin_src lisp 
+  (eth::generate-ethereum-keypair/codex)
+#+end_src
+
 #+RESULTS:
 : ((:PRIVATE-KEY . #<IRONCLAD:SECP256K1-PRIVATE-KEY {7C1BAB60}>)
 :  (:PUBLIC-KEY . #<IRONCLAD:SECP256K1-PUBLIC-KEY {72DC4A93}>)
@@ -43,5 +48,5 @@ With an ANSI Common Lisp implementation configured with Quicklisp
 * Colophon  
   #+begin_example
     Created: 2024-09-20
-    Revised: <2024-09-21 Sat 13:56>
+    Revised: <2024-09-25 Wed 09:33>
   #+end_example
